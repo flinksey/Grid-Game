@@ -44,7 +44,8 @@ def set_up():
     contents = [[rand_gen(K),row,col] for row in row_label for col in col_label]
     
     row_label.insert(0, " ")
-    print(contents)
+   
+    #print(contents)
     print("\nGame on!\n")
     
     grid_gen(M,N,row_label,col_label,contents)
