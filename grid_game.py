@@ -10,11 +10,11 @@ def scorekeeper():
     #keeps score lol
     return 0
 
-def adj_match(contents, cell_val, match_count):
-    #fxn that searches for adjacent matches, if any
-    checklist = [] #this is the list of the matches -- to check for adj matches of selected cell's matches
+def adj_match(contents, cell_val, checklist):
+    #fxn that searches for adjacent matches, if any    
+    #need to check left, right, top, bottom
     
-    c
+    #adj_match for each each cell in checklist    
     return 0
 
 def coords_check(contents):
@@ -25,7 +25,8 @@ def coords_check(contents):
     cell_ind = 0 #to check whether the cell is empty later
     is_coord = 0 #increased to 1 if the coordinates are within bounds
     cell_val = 0 #displayed int in cell
-    match_count = 0 #number of potential matches in grid
+    
+    checklist = 0 #list of matching cells
     no_matches = 0 #list of cell coords with >= 3 possible matches
     
     #are the coordinates within range?
@@ -37,6 +38,7 @@ def coords_check(contents):
     #is the selected cell "empty"?
     if is_coord and if contents[cell_ind][0] != "-":
         cell_val = contents[cell_ind][0]
+        checklist.append(contents[cell_ind]) #selected cell should be the first in the checklist
     else:
         print("Invalid Input! Try again.")
         coords_check(contents)
@@ -44,11 +46,11 @@ def coords_check(contents):
     #does the value in the selected cell have at least 2 possible matches?
     for _ in contents:
         if _[0] == cell_val:
-            match_count += 1
+            checklist.append(_)
             
-    if match_count >= 3:
+    if len(checklist) >= 3:
         #does the value in the selected cell have at least 2 adjacent matches?
-        adj_match(contents)
+        adj_match(contents, cell_val, checklist)
     else:
         print("Invalid Input! Try again.")
         coords_check(contents)
