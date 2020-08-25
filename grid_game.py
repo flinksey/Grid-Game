@@ -10,12 +10,42 @@ def scorekeeper():
     #keeps score lol
     return 0
 
-def adj_match(contents, cell_val, checklist):
-    #fxn that searches for adjacent matches, if any    
-    #need to check left, right, top, bottom
+def adj_match(checklist):
+    #fxn that searches for adjacent matches, if any: bottom, top, right, left    
+    in_check = checklist.copy()
+    base = ref_list[0] #selected cell
+    counter = len(checklist)
     
-    #adj_match for each each cell in checklist    
-    return 0
+    if len(checklist):
+        while counter:
+            for cell in in_check:
+                if (cell[1] == base[1] + 1) and (cell[2] == base[2]):#bottom
+                    if cell not in checked:
+                        checked.append(cell)
+                if (cell[1] == base[1] - 1) and (cell[2] == base[2]):#top
+                    if cell not in checked:
+                        checked.append(cell)
+                if (cell[1] == base[1]) and (cell[2] == base[2] + 1):#right
+                    if cell not in checked:
+                        checked.append(cell)
+                if (cell[1] == base[1]) and (cell[2] == base[2] - 1):#left
+                    if cell not in checked:
+                        checked.append(cell)
+            counter -= 1
+    
+    del in_check[0]
+    
+    #[some loop] adj_match() for each cell in checklist
+    return 0 #needs to return no. of matches, 
+
+def iter_match(checklist):
+    #fxn that tracks checking of adj matches per adj match of selected cell
+    checked = [] 
+    in_check = checklist.copy() #to track the cells that still need to be checked for matches
+    
+    while len(in_check):
+        adj_match(in_check)
+        del in_check[0] #how can I update the list (need to make it "empty" + gravity)
 
 def coords_check(contents):
     #fxn that checks whether input coords are valid
@@ -50,7 +80,7 @@ def coords_check(contents):
             
     if len(checklist) >= 3:
         #does the value in the selected cell have at least 2 adjacent matches?
-        adj_match(contents, cell_val, checklist)
+        iter_match(checklist)
     else:
         print("Invalid Input! Try again.")
         coords_check(contents)
