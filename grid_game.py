@@ -6,8 +6,17 @@ def rand_gen(K):
     num = random.randint(0,K-1)
     return num
 
-def scorekeeper():
+def scorekeeper(matches):
     #keeps score lol
+    score = (matches - 2)**2
+    return score
+
+def is_game():
+    #fxn that determines whether the game is still in session or if there are no more possible plays
+    return 0
+
+def contents_update():
+    #fxn that accounts for emptying of matching cells + gravity
     return 0
 
 def adj_match(checklist):
@@ -47,7 +56,7 @@ def iter_match(checklist):
         adj_match(in_check)
         del in_check[0] #how can I update the list (need to make it "empty" + gravity)
 
-def coords_check(contents):
+def play(contents):
     #fxn that checks whether input coords are valid
     r_coord = int(input("Please enter the row number: "))
     c_coord = int(input("Please enter the col number: "))
@@ -56,8 +65,8 @@ def coords_check(contents):
     is_coord = 0 #increased to 1 if the coordinates are within bounds
     cell_val = 0 #displayed int in cell
     
-    checklist = 0 #list of matching cells
-    no_matches = 0 #list of cell coords with >= 3 possible matches
+    checklist = 0 #list of matching cells, incl. selected
+    no_matches = 0 #list of cell coords with <2 possible matches; should have a regularly updated record so that we can run a check for is_game
     
     #are the coordinates within range?
     for coord in contents:
@@ -66,12 +75,12 @@ def coords_check(contents):
             is_coord += 1
     
     #is the selected cell "empty"?
-    if is_coord and if contents[cell_ind][0] != "-":
+    if is_coord and contents[cell_ind][0] != "-":
         cell_val = contents[cell_ind][0]
         checklist.append(contents[cell_ind]) #selected cell should be the first in the checklist
     else:
-        print("Invalid Input! Try again.")
-        coords_check(contents)
+        print("Invalid Input! Selected cell is empty. Try again.")
+        play(contents)
     
     #does the value in the selected cell have at least 2 possible matches?
     for _ in contents:
@@ -83,7 +92,9 @@ def coords_check(contents):
         iter_match(checklist)
     else:
         print("Invalid Input! Try again.")
-        coords_check(contents)
+        play(contents)
+    
+    #needs to return number of cleared cells
         
 def grid_gen(M,N,row_label,col_label,contents):
     #fxn that generates the grid each time (from beginning through udpates)
@@ -96,6 +107,14 @@ def grid_gen(M,N,row_label,col_label,contents):
             for col in range(N):
                 print(contents[(row-1)*N + col][0], end = "  ")
         print("  ")
+        
+    is_game = play(contents)
+    
+    if is_game[0]: #if the returned value is True, continue playing game
+        grid_gen(M,N,row_label,col_label,contents)
+    elif not is_game[0]: #else, game over
+        print("Game over. Good effort!")
+        #need to put something here for the final score output
 
 def set_up():
     M = int(input("no. of rows: "))
