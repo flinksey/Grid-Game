@@ -1,101 +1,75 @@
-#LATEST VERSION
-#format-wise: it looks alright with max of M,N,K = 10
-
 import random
+from collections import Counter
+
 def rand_gen(K):
     num = random.randint(0,K-1)
     return num
 
-def scorekeeper(matches):
-    #keeps score lol
-    score = (matches - 2)**2
-    return score
-
-def is_game():
-    #fxn that determines whether the game is still in session or if there are no more possible plays
+def adj_check(contents, checklist):
+    #fxn that looks for the adjacent matches
     return 0
 
-def contents_update():
-    #fxn that accounts for emptying of matching cells + gravity
-    return 0
-
-def adj_match(checklist):
-    #fxn that searches for adjacent matches, if any: bottom, top, right, left    
-    in_check = checklist.copy()
-    base = ref_list[0] #selected cell
-    counter = len(checklist)
-    
-    if len(checklist):
-        while counter:
-            for cell in in_check:
-                if (cell[1] == base[1] + 1) and (cell[2] == base[2]):#bottom
-                    if cell not in checked:
-                        checked.append(cell)
-                if (cell[1] == base[1] - 1) and (cell[2] == base[2]):#top
-                    if cell not in checked:
-                        checked.append(cell)
-                if (cell[1] == base[1]) and (cell[2] == base[2] + 1):#right
-                    if cell not in checked:
-                        checked.append(cell)
-                if (cell[1] == base[1]) and (cell[2] == base[2] - 1):#left
-                    if cell not in checked:
-                        checked.append(cell)
-            counter -= 1
-    
-    del in_check[0]
-    
-    #[some loop] adj_match() for each cell in checklist
-    return 0 #needs to return no. of matches, 
-
-def iter_match(checklist):
-    #fxn that tracks checking of adj matches per adj match of selected cell
-    checked = [] 
-    in_check = checklist.copy() #to track the cells that still need to be checked for matches
-    
-    while len(in_check):
-        adj_match(in_check)
-        del in_check[0] #how can I update the list (need to make it "empty" + gravity)
-
-def play(contents):
-    #fxn that checks whether input coords are valid
-    r_coord = int(input("Please enter the row number: "))
-    c_coord = int(input("Please enter the col number: "))
-    
-    cell_ind = 0 #to check whether the cell is empty later
-    is_coord = 0 #increased to 1 if the coordinates are within bounds
-    cell_val = 0 #displayed int in cell
-    
-    checklist = 0 #list of matching cells, incl. selected
-    no_matches = 0 #list of cell coords with <2 possible matches; should have a regularly updated record so that we can run a check for is_game
+def coords_check(contents):
+    #fxn that checks whether the User input for selected cell is valid
+    r = int(input("Please input the row number: "))
+    c = int(input("Please input the col number: "))
+    cell_index = 0
+    is_valid = False
+    checklist = []
     
     #are the coordinates within range?
     for coord in contents:
-        if coord[1] == r_coord and coord[2] == c_coord:
-            cell_ind = contents.index(coord)
-            is_coord += 1
-    
-    #is the selected cell "empty"?
-    if is_coord and contents[cell_ind][0] != "-":
-        cell_val = contents[cell_ind][0]
-        checklist.append(contents[cell_ind]) #selected cell should be the first in the checklist
-    else:
-        print("Invalid Input! Selected cell is empty. Try again.")
-        play(contents)
-    
-    #does the value in the selected cell have at least 2 possible matches?
-    for _ in contents:
-        if _[0] == cell_val:
-            checklist.append(_)
+        if coord[1] == r and coord[2] == c:
+            cell_index = contents.index(coord)
+            cell_value = coord[0]
+            is_valid = True
+        else:
+            print("Input out of bounds. Try again!")
+            coords_check(contents)
             
-    if len(checklist) >= 3:
-        #does the value in the selected cell have at least 2 adjacent matches?
-        iter_match(checklist)
+    #is the cell empty?
+    if is_valid and cell_value != "-":
+        checklist.append(contents[cell_index])
     else:
-        print("Invalid Input! Try again.")
-        play(contents)
-    
-    #needs to return number of cleared cells
+        print("Selected cell is empty. Try again!")
+        coords_check(contents)
         
+    for cell in contents:
+        if cell[0] == cell_value:
+            checklist.append(cell)
+    
+    #are there enough potential matches?
+    if len(checklist) >= 3:
+        adj_check(contents, checklist)
+    else:
+        print("Not enough possible matches. Try again!")
+        coords_check(contents)
+
+def is_game(contents):
+    #fxn that checks whether there are any possible plays in the current round
+    #basically, this should just check whether any displayed value has more than 2 occurrences
+    cell_values = [i[0] for i in contents]
+    count = Counter(cell_values)
+    validity = False
+    for value in count.values():
+        if value >= 3:
+            validity = True
+            break
+    return validity
+
+def play(contents):
+    in_play = is_game(contents)
+    if in_play:
+        coords_check(contents)
+    else:
+        #assumes User is not trolling
+        print("Game over! No more possible plays. Input 1 to play again. Input 0 to stop playing.")
+       # play_again = int(input("Would you like to start a new game? "))
+       # if play_again == 1:
+       #     set_up() #ERROR: fxn defined before set_up() ---> this is a problem for MUCH later
+       # else:
+       #     end_game()
+
 def grid_gen(M,N,row_label,col_label,contents):
     #fxn that generates the grid each time (from beginning through udpates)
     for row in range(M+1):
@@ -107,14 +81,6 @@ def grid_gen(M,N,row_label,col_label,contents):
             for col in range(N):
                 print(contents[(row-1)*N + col][0], end = "  ")
         print("  ")
-        
-    is_game = play(contents)
-    
-    if is_game[0]: #if the returned value is True, continue playing game
-        grid_gen(M,N,row_label,col_label,contents)
-    elif not is_game[0]: #else, game over
-        print("Game over. Good effort!")
-        #need to put something here for the final score output
 
 def set_up():
     M = int(input("no. of rows: "))
