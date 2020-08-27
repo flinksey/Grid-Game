@@ -81,6 +81,8 @@ def grid_gen(M,N,row_label,col_label,contents):
             for col in range(N):
                 print(contents[(row-1)*N + col][0], end = "  ")
         print("  ")
+    
+    play(contents)
 
 def set_up():
     M = int(input("no. of rows: "))
