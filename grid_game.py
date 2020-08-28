@@ -112,12 +112,14 @@ def play(contents):
 
 def grid_gen(): #parameters: M,N,row_label,col_label,contents
     #fxn that generates the grid each time (from beginning through udpates)
+    #comment out test case
     M = 3
     N = 2
     row_label = [i for i in range(3)]
     col_label = [j for j in range(2)]
     row_label.insert(0," ")
     contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
+    
     for row in range(M+1):
         print(row_label[row], end = "  ")
         if row == 0:
@@ -134,8 +136,7 @@ def set_up():
     M = int(input("no. of rows: "))
     N = int(input("no. of cols: "))
     K = int(input("boundary no: "))
-    
-    #contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
+   
     row_label = [j for j in range(M)]
     col_label = [i for i in range(N)]    
     contents = [[rand_gen(K),row,col] for row in row_label for col in col_label]
