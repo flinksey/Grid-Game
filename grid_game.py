@@ -1,3 +1,5 @@
+#LATEST VERSION
+#needs to account for when there are no possible plays (not enough adj matches for any int) but there are at least 3 cells displaying the same value
 import random
 from collections import Counter
 
@@ -5,39 +7,52 @@ def rand_gen(K):
     num = random.randint(0,K-1)
     return num
 
-def adj_check(contents, checklist):
+
+
+def adj_check(selected, contents, checklist):
     #fxn that looks for the adjacent matches
     #print("adj_check has run.")
     #NEED TO: comment out or remove print statements for testing
     
-    in_check = checklist.copy()
-    matches = []
+    #NEED TO EDIT: so that we only check the adj matches of those that are adj matches of the selected cell
+    in_check = checklist
+    matches = [] #matches of selected cell, including selected cell
+    sel_matches = [] #dummy var just to keep track of the ones matching for the first run
     
     print("checklist:", checklist)
     while len(checklist) > 0:
         for item in checklist:
-            for cell in in_check:
-                if (cell[1] == item[1] + 1) and (cell[2] == item[2]) and cell not in matches:#bottom
-                    matches.append(cell)
-                    print("checklist:", in_check)
-                    print("matches:", matches)
-                elif (cell[1] == item[1] - 1) and (cell[2] == item[2]) and cell not in matches:#top
-                    matches.append(cell)
-                    print("checklist:", in_check)
-                    print("matches:", matches)
-                elif (cell[1] == item[1]) and (cell[2] == item[2] + 1) and cell not in matches:#right
-                    matches.append(cell)
-                    print("checklist:", in_check)
-                    print("matches:", matches)
-                elif (cell[1] == item[1]) and (cell[2] == item[2] - 1) and cell not in matches:#left
-                    matches.append(cell)
-                    print("checklist:", in_check)
-                    print("matches:", matches)
+            if item == selected:
+                for cell in in_check:
+                    if (cell[1] == item[1] + 1) and (cell[2] == item[2]):#bottom
+                        matches.append(cell)
+                    elif (cell[1] == item[1] - 1) and (cell[2] == item[2]):#top
+                        matches.append(cell)
+                    elif (cell[1] == item[1]) and (cell[2] == item[2] + 1):#right
+                        matches.append(cell)
+                    elif (cell[1] == item[1]) and (cell[2] == item[2] - 1):#left
+                        matches.append(cell)
+            elif (item != selected) and (item in matches):
+                count = len(sel_matches)
+                for _ in in_check:
+                    if (_[1] == item[1] + 1) and (_[2] == item[2]):#bottom
+                        sel_matches.append(_)
+                    elif (_[1] == item[1] - 1) and (_[2] == item[2]):#top
+                        sel_matches.append(_)
+                    elif (_[1] == item[1]) and (_[2] == item[2] + 1):#right
+                        sel_matches.append(_)
+                    elif (_[1] == item[1]) and (_[2] == item[2] - 1):#left
+                        sel_matches.append(_)
+                    #if len(sel_matches) == count + 1 and (item not in sel_matches):
+                     #   sel_matches.append(item)
+                      
             checklist.remove(item)
+            
     print("checklist:", checklist)
     print("matches:", matches)
+    print("sel_matches:", sel_matches)
     
-    return matches
+    return sel_matches
 
 def coords_check(contents):
     #fxn that checks whether the User input for selected cell is valid
@@ -47,14 +62,14 @@ def coords_check(contents):
     is_valid = False
     cell_index = 0
     checklist = []
-    sel_cell = 0
+    selected = 0
     
     #are the coordinates within range?
     for coord in contents:
         if coord[1] == r and coord[2] == c:
             cell_index = contents.index(coord)
             cell_value = coord[0]
-            sel_cell = coord
+            selected = coord
             is_valid = True
             break
     if is_valid == False:
@@ -75,12 +90,13 @@ def coords_check(contents):
     
     #are there enough potential matches?
     if len(checklist) >= 3:
-        is_checked = adj_check(contents, checklist)
-        if sel_cell in is_checked:
+        is_checked = adj_check(selected,contents, checklist)
+        if selected in is_checked and len(is_checked) >= 3:
             #grid_update()
             print("VALID SELECTION!")
         else:
             print("Not enough adjacent matches. Try again!")
+            coords_check(contents)
     else:
         print("Not enough possible matches. Try again!")
         coords_check(contents)
@@ -110,15 +126,16 @@ def play(contents):
        # else:
        #     end_game()
 
-def grid_gen(): #parameters: M,N,row_label,col_label,contents
+def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_label,contents
     #fxn that generates the grid each time (from beginning through udpates)
     #comment out test case
-    M = 3
-    N = 2
-    row_label = [i for i in range(3)]
-    col_label = [j for j in range(2)]
-    row_label.insert(0," ")
-    contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
+    
+    #M = 3
+    #N = 2
+    #row_label = [i for i in range(3)]
+    #col_label = [j for j in range(2)]
+    #row_label.insert(0," ")
+    #contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
     
     for row in range(M+1):
         print(row_label[row], end = "  ")
@@ -136,7 +153,7 @@ def set_up():
     M = int(input("no. of rows: "))
     N = int(input("no. of cols: "))
     K = int(input("boundary no: "))
-   
+    
     row_label = [j for j in range(M)]
     col_label = [i for i in range(N)]    
     contents = [[rand_gen(K),row,col] for row in row_label for col in col_label]
@@ -147,5 +164,5 @@ def set_up():
     
     grid_gen(M,N,row_label,col_label,contents)
 
-grid_gen()
-#set_up()
+#grid_gen()
+set_up()
