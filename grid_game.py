@@ -1,3 +1,4 @@
+#LATEST AS OF AUGUST 31, 2020
 import random
 from collections import Counter
 
@@ -5,8 +6,43 @@ def rand_gen(K):
     num = random.randint(0,K-1)
     return num
 
-def grid_update():
+def score(match_len):
+    score = (match_len - 2)**2
+    return score
+
+def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_label,contents
+    #fxn that generates the grid each time (from beginning through udpates)
+    #comment out test case
+    
+    #M = 3
+    #N = 2
+    #row_label = [i for i in range(3)]
+    #col_label = [j for j in range(2)]
+    #row_label.insert(0," ")
+    #contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
+    
+    for row in range(M+1):
+        print(row_label[row], end = "  ")
+        if row == 0:
+            for col in range(N):
+                print(col_label[col], end = "  ")
+        else:
+            for col in range(N):
+                print(contents[(row-1)*N + col][0], end = "  ")
+        print("  ")
+    
     return 0
+
+def grid_update(matches, contents):
+    #fxn that updates the contents list to reflect "dropped" cells
+    updated_contents = contents.copy()
+    for cell in updated_contents:
+        if cell in matches:
+            cell[0] = "-"
+        else:
+            continue
+    print("updated_contents:", updated_contents)
+    return updated_contents
 
 def adj_check(basis, contents, checklist):
     #fxn that looks for the adjacent matches
@@ -16,13 +52,13 @@ def adj_check(basis, contents, checklist):
     #NEED TO EDIT: so that we only check the adj matches of those that are adj matches of the selected cell
     in_check = checklist.copy()
     matches = [] #matches of selected cell, including selected cell
-    sel_matches = [basis] #dummy var just to keep track of the ones matching for the first run
     count = len(checklist)
     
     print("checklist:", checklist)
     while count > 0:
         for item in checklist:
             if item == basis:
+                matches.append(item)
                 for cell in in_check:
                     if (cell[1] == item[1] + 1) and (cell[2] == item[2]) and cell not in matches:#bottom
                         matches.append(cell)
@@ -32,21 +68,20 @@ def adj_check(basis, contents, checklist):
                         matches.append(cell)
                     elif (cell[1] == item[1]) and (cell[2] == item[2] - 1) and cell not in matches:#left
                         matches.append(cell)
-            elif item != basis: #item in matches:
-                for cell in matches:
-                    if (cell[1] == item[1] + 1) and (cell[2] == item[2]) and cell != basis:#bottom
-                        sel_matches.append(cell)
-                    elif (cell[1] == item[1] - 1) and (cell[2] == item[2]) and cell != basis:#top
-                        sel_matches.append(cell)
-                    elif (cell[1] == item[1]) and (cell[2] == item[2] + 1) and cell != basis:#right
-                        sel_matches.append(cell)
-                    elif (cell[1] == item[1]) and (cell[2] == item[2] - 1) and cell != basis:#left
-                        sel_matches.append(cell)
+            else:
+                for cell in in_check:
+                    for item in matches:
+                        if (cell[1] == item[1] + 1) and (cell[2] == item[2]) and cell not in matches:#bottom
+                            matches.append(cell)
+                        elif (cell[1] == item[1] - 1) and (cell[2] == item[2]) and cell not in matches:#top
+                            matches.append(cell)
+                        elif (cell[1] == item[1]) and (cell[2] == item[2] + 1) and cell not in matches:#right
+                            matches.append(cell)
+                        elif (cell[1] == item[1]) and (cell[2] == item[2] - 1) and cell not in matches:#left
+                            matches.append(cell)
             count = count -1
-            
-    print("checklist:", checklist)
-    print("sel_matches:", matches)
     
+    print("matches:", matches)
     return matches
 
 def coords_check(contents):
@@ -88,13 +123,15 @@ def coords_check(contents):
         is_checked = adj_check(selected, contents, checklist)
         if selected in is_checked and len(is_checked) >= 3:
             print("VALID SELECTION!")
-            #grid_update()
+            update = grid_update(is_checked, contents)
         else:
             print("Not enough adjacent matches. Try again!")
             coords_check(contents)
     else:
         print("Not enough possible matches. Try again!")
         coords_check(contents)
+
+    return update
 
 def is_game(contents):
     #fxn that checks whether there are any possible plays in the current round
@@ -109,9 +146,7 @@ def is_game(contents):
     return validity
 
 def play(contents):
-    in_play = is_game(contents)
-    if in_play:
-        coords_check(contents)
+    coords_check(contents)
     else:
         #assumes User is not trolling
         print("Game over! No more possible plays. Input 1 to play again. Input 0 to stop playing.")
@@ -120,29 +155,6 @@ def play(contents):
        #     set_up() #ERROR: fxn defined before set_up()
        # else:
        #     end_game()
-
-def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_label,contents
-    #fxn that generates the grid each time (from beginning through udpates)
-    #comment out test case
-    
-    #M = 3
-    #N = 2
-    #row_label = [i for i in range(3)]
-    #col_label = [j for j in range(2)]
-    #row_label.insert(0," ")
-    #contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
-    
-    for row in range(M+1):
-        print(row_label[row], end = "  ")
-        if row == 0:
-            for col in range(N):
-                print(col_label[col], end = "  ")
-        else:
-            for col in range(N):
-                print(contents[(row-1)*N + col][0], end = "  ")
-        print("  ")
-    
-    play(contents)
 
 def set_up():
     M = int(input("no. of rows: "))
@@ -157,7 +169,15 @@ def set_up():
     print(contents)
     print("\nGame on!\n")
     
-    grid_gen(M,N,row_label,col_label,contents)
+    while is_game(contents):
+        grid_gen(M,N,row_label,col_label,contents)
+        play(contents)
 
-#grid_gen()
+    print("Game over! No more possible plays. Input 1 to play again. Input 0 to stop playing.")
+    in_play = int(input("Would you like to start a new game? "))
+    if in_play:
+        set_up()
+    else:
+        print("Thank you for playing!")
+
 set_up()
