@@ -1,4 +1,4 @@
-#LATEST AS OF AUGUST 31, 2020
+##### LATEST AS OF AUGUST 31, 2020
 import random
 from collections import Counter
 
@@ -36,20 +36,29 @@ def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_l
 def grid_update(matches, contents):
     #fxn that updates the contents list to reflect "dropped" cells
     updated_contents = contents.copy()
+
     for cell in updated_contents:
         if cell in matches:
             cell[0] = "-"
         else:
             continue
-    print("updated_contents:", updated_contents)
+           
+    for cell in updated_contents:
+        for ff in matches:
+            if cell[0] != "-" and ff[0] == "-" and ff[1] == cell[1]+1 and ff[2] == cell[2]:
+                ff[0] = cell[0]
+                cell[0] = "-"
+            elif cell[0] == "-" and ff[0] != "-" and ff[1] == cell[1]-1 and ff[2] == cell[2]:
+                cell[0] = ff[0]
+                ff[0] = "-"
+                
+        
+    #print("updated_contents:", updated_contents)
     return updated_contents
 
 def adj_check(basis, contents, checklist):
     #fxn that looks for the adjacent matches
-    #print("adj_check has run.")
-    #NEED TO: comment out or remove print statements for testing
-    
-    #NEED TO EDIT: so that we only check the adj matches of those that are adj matches of the selected cell
+
     in_check = checklist.copy()
     matches = [] #matches of selected cell, including selected cell
     count = len(checklist)
@@ -81,18 +90,18 @@ def adj_check(basis, contents, checklist):
                             matches.append(cell)
             count = count -1
     
-    print("matches:", matches)
+    #print("matches:", matches)
     return matches
 
-def coords_check(contents):
+def coords_check(contents, points):
     #fxn that checks whether the User input for selected cell is valid
-    #NEED TO ACCOUNT FOR: if the selected cell is not in the matches list, then User must select a new cell
     r = int(input("Please input the row number: "))
     c = int(input("Please input the col number: "))
     is_valid = False
     cell_index = 0
     checklist = []
     selected = 0
+    update = None
     
     #are the coordinates within range?
     for coord in contents:
@@ -104,14 +113,14 @@ def coords_check(contents):
             break
     if is_valid == False:
         print("Input out of bounds. Try again!")
-        coords_check(contents)
+        coords_check(contents, points)
             
     #is the cell empty?
     if cell_value != "-":
         checklist.append(contents[cell_index])
     else:
         print("Selected cell is empty. Try again!")
-        coords_check(contents)
+        coords_check(contents, points)
     
     #what are the adjacent matches?
     for cell in contents:
@@ -123,15 +132,18 @@ def coords_check(contents):
         is_checked = adj_check(selected, contents, checklist)
         if selected in is_checked and len(is_checked) >= 3:
             print("VALID SELECTION!")
+            points += score(len(is_checked))
             update = grid_update(is_checked, contents)
+            print("Score: ", points)
+            print("\n")
         else:
             print("Not enough adjacent matches. Try again!")
-            coords_check(contents)
+            coords_check(contents, points)
     else:
         print("Not enough possible matches. Try again!")
-        coords_check(contents)
+        coords_check(contents, point)
 
-    return update
+    return [update, points]
 
 def is_game(contents):
     #fxn that checks whether there are any possible plays in the current round
@@ -145,17 +157,6 @@ def is_game(contents):
             break
     return validity
 
-def play(contents):
-    coords_check(contents)
-    else:
-        #assumes User is not trolling
-        print("Game over! No more possible plays. Input 1 to play again. Input 0 to stop playing.")
-       # play_again = int(input("Would you like to start a new game? "))
-       # if play_again == 1:
-       #     set_up() #ERROR: fxn defined before set_up()
-       # else:
-       #     end_game()
-
 def set_up():
     M = int(input("no. of rows: "))
     N = int(input("no. of cols: "))
@@ -164,14 +165,19 @@ def set_up():
     row_label = [j for j in range(M)]
     col_label = [i for i in range(N)]    
     contents = [[rand_gen(K),row,col] for row in row_label for col in col_label]
+    score = 0
     
     row_label.insert(0, " ")
     print(contents)
     print("\nGame on!\n")
+    print("\nScore: ", score)
     
     while is_game(contents):
         grid_gen(M,N,row_label,col_label,contents)
-        play(contents)
+        play = coords_check(contents, score)
+        contents = play[0]
+        score = play[1]
+        
 
     print("Game over! No more possible plays. Input 1 to play again. Input 0 to stop playing.")
     in_play = int(input("Would you like to start a new game? "))
