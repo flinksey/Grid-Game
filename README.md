@@ -1,6 +1,6 @@
 ### Goal: Create a grid game that's sort of like Candy Crush
 #### Start Date: Aug. 19, 2020
-#### Projected End Date: Sept. 6, 2020
+#### Last Updated: September 4, 2020
 
 #### Ello! This is where I'm currently working on an old project (modified) from first semester of last year. It was a grid game implemented in Python. Last year, it took me four days of going to sleep and waking up still mentally debugging to get it to about 60% functionality. I know it'll take me longer to get it up and running this time around but, hey, it'll be fun!
 
