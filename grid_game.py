@@ -1,4 +1,4 @@
-##### LATEST AS OF AUGUST 31, 2020
+##### LATEST AS OF SEPTEMBER 7, 2020
 import random
 from collections import Counter
 
@@ -12,15 +12,7 @@ def score(match_len):
 
 def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_label,contents
     #fxn that generates the grid each time (from beginning through udpates)
-    #comment out test case
-    
-    #M = 3
-    #N = 2
-    #row_label = [i for i in range(3)]
-    #col_label = [j for j in range(2)]
-    #row_label.insert(0," ")
-    #contents = [[0, 0, 0], [2, 0, 1], [2, 1, 0], [0, 1, 1], [0, 2, 0], [0, 2, 1]]
-    
+
     for row in range(M+1):
         print(row_label[row], end = "  ")
         if row == 0:
@@ -44,7 +36,7 @@ def grid_update(matches, contents):
             continue
            
     for cell in updated_contents:
-        for ff in matches:
+        for ff in updated_contents:
             if cell[0] != "-" and ff[0] == "-" and ff[1] == cell[1]+1 and ff[2] == cell[2]:
                 ff[0] = cell[0]
                 cell[0] = "-"
@@ -63,7 +55,7 @@ def adj_check(basis, contents, checklist):
     matches = [] #matches of selected cell, including selected cell
     count = len(checklist)
     
-    print("checklist:", checklist)
+    #print("checklist:", checklist)
     while count > 0:
         for item in checklist:
             if item == basis:
@@ -141,14 +133,14 @@ def coords_check(contents, points):
             coords_check(contents, points)
     else:
         print("Not enough possible matches. Try again!")
-        coords_check(contents, point)
+        coords_check(contents, points)
 
     return [update, points]
 
 def is_game(contents):
     #fxn that checks whether there are any possible plays in the current round
     #basically, this should just check whether any displayed value has more than 2 occurrences
-    cell_values = [i[0] for i in contents]
+    cell_values = [i[0] for i in contents if i[0] != "-"]
     count = Counter(cell_values)
     validity = False
     for value in count.values():
