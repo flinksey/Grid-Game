@@ -2,6 +2,8 @@
 #### Start Date: Aug. 19, 2020
 #### Last Updated: September 24, 2020
 
+#### Update: Will be uploading a Jupyter Notebook for the game soon!
+
 #### Ello! This is where I'm currently working on an old project (modified) from first semester of last year. It was a grid game implemented in Python. Last year, it took me four days of going to sleep and waking up still mentally debugging to get it to about 60% functionality. I know it'll take me longer to get it up and running this time around but, hey, it'll be fun!
 
 #### How does this game work? \[note: subject to change\]
