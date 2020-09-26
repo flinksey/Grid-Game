@@ -1,4 +1,4 @@
-##### LATEST AS OF SEPTEMBER 7, 2020
+##### LATEST AS OF SEPTEMBER 27, 2020
 import random
 from collections import Counter
 
@@ -27,26 +27,38 @@ def grid_gen(M,N,row_label,col_label,contents): #parameters: M,N,row_label,col_l
 
 def grid_update(matches, contents):
     #fxn that updates the contents list to reflect "dropped" cells
-    updated_contents = contents.copy()
+    upd = contents.copy()
+    count = 0
 
-    for cell in updated_contents:
+    for cell in upd:
         if cell in matches:
             cell[0] = "-"
         else:
             continue
-           
-    for cell in updated_contents:
-        for ff in updated_contents:
+    
+    #vertical
+    for cell in upd:
+        for ff in upd:
             if cell[0] != "-" and ff[0] == "-" and ff[1] == cell[1]+1 and ff[2] == cell[2]:
                 ff[0] = cell[0]
                 cell[0] = "-"
             elif cell[0] == "-" and ff[0] != "-" and ff[1] == cell[1]-1 and ff[2] == cell[2]:
                 cell[0] = ff[0]
                 ff[0] = "-"
-                
+    '''
+    for bloc in upd:
+        if bloc[0] != "-" and bloc[1] != 0: #if it's not empty, look below
+            for i in range(len(upd)):
+                if upd[i][0] == "-" and upd[i][1] == bloc[1] + 1 and upd[i][2] == bloc[2]:
+                    while count <= len(upd) and i < len(upd):
+                        upd[i][0] = bloc[0]
+                        bloc[0] = "-"
+                        i += 1
+                        #print(i)
+    '''
         
     #print("updated_contents:", updated_contents)
-    return updated_contents
+    return upd
 
 def adj_check(basis, contents, checklist):
     #fxn that looks for the adjacent matches
